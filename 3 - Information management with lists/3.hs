@@ -28,9 +28,10 @@ type Trip = [Step]
 
 -- 1.a) test if a step is well defined (arrival time is after departure time)
 checkStep :: Step -> Bool
-checkStep ((H h1 m1), (H h2 m2)) | h2 > h1                  = True
-                                 | (h2 == h1) && (m2 >= m1) = True
-                                 | otherwise                = False
+checkStep ((H h1 m1), (H h2 m2))
+  | h2 > h1                  = True
+  | (h2 == h1) && (m2 >= m1) = True
+  | otherwise                = False
 
 -- 1.b) test if a trip is well defined (each step is well defined, and the next step always starts after the last step was over)
 checkTrip :: Trip -> Bool
@@ -67,16 +68,17 @@ type Polygonal = [PlanePoint] -- (PlanePoint is defined in 1.hs)
 
 -- 2.a) define a function that returns the length of a polygonal line
 polygonalLength :: Polygonal -> Double
-polygonalLength []  = 0
-polygonalLength [_] = 0
+polygonalLength []    = 0
+polygonalLength [_]   = 0
 polygonalLength (h:t) = (dist2points h (head t)) + (polygonalLength ((head t):(tail t)))
 
 -- 2.b) define a function that tests if a given polygonal line is closed
 isClosedPolygonal :: Polygonal -> Bool
 isClosedPolygonal []  = False
 isClosedPolygonal [x] = False
-isClosedPolygonal l | (head l) == (last l) = True
-                    | otherwise            = False
+isClosedPolygonal l
+  | (head l) == (last l) = True
+  | otherwise            = False
 
 -- 2.c) define a function that given a closed and convex polygonal line, computes a list of triangles which the sum of the areas is equal to the area delimited by a polygonal line
 triangulate :: Polygonal -> [Figure]
@@ -110,41 +112,47 @@ type Phonebook = [(Name, [Contact])]
 -- 3.a) define a function that given a name, email address, and phonebook, returns a new phonebook with the email added to the pair of the given name
 addEmail :: Name -> String -> Phonebook -> Phonebook
 addEmail n e [] = [(n, [Email e])]
-addEmail n e (p:ps) | (n == (fst p)) = (((fst p), ((Email e):(snd p))):ps)
-                    | otherwise      = (p:(addEmail n e ps))
+addEmail n e (p:ps)
+  | (n == (fst p)) = (((fst p), ((Email e):(snd p))):ps)
+  | otherwise      = (p:(addEmail n e ps))
 
 -- 3.b) define a function that returns all email addresses associated with a given name in a phonebook
 getEmails :: [Contact] -> [String]
-getEmails x = case x of
-                []             -> []
-                ((Email x):cs) -> [x] ++ getEmails cs
-                (_:cs)         -> getEmails cs
+getEmails [] = []
+getEmails x =
+  case x of
+    ((Email x):cs) -> [x] ++ getEmails cs
+    (_:cs)         -> getEmails cs
 
 returnEmails :: Name -> Phonebook -> Maybe [String]
 returnEmails n [] = Nothing
-returnEmails n p | (fst (head p)) == n = Just (getEmails (snd (head p)))
-                 | otherwise           = (returnEmails n (tail p))
+returnEmails n p
+  | (fst (head p)) == n = Just (getEmails (snd (head p)))
+  | otherwise           = (returnEmails n (tail p))
 
 -- 3.c) define a function that returns all phone numbers (Home, Work, Phone) in a given contact list
 -- (changed data type from the one used on the exercise sheet in order to distinguish different numbers by their constructor)
 getNums :: [Contact] -> [Contact]
-getNums x = case x of
-                   []             -> []
-                   ((Email _):cs) -> getNums cs
-                   (c:cs)         -> [c] ++ getNums cs
+getNums [] = []
+getNums x =
+  case x of
+    ((Email _):cs) -> getNums cs
+    (c:cs)         -> [c] ++ getNums cs
 
 -- 3.d) define a function that returns the home number in a phonebook associated with a given name
 -- (changed data type from the one used on the exercise sheet in order to support multiple numbers associated with the same name)
 getHome :: [Contact] -> [Integer]
-getHome x = case x of
-              []            -> []
-              ((Home c):cs) -> [c] ++ getHome cs
-              (_:cs)        -> getHome cs
+getHome [] = []
+getHome x =
+  case x of
+    ((Home c):cs) -> [c] ++ getHome cs
+    (_:cs)        -> getHome cs
 
 returnHome :: Name -> Phonebook -> Maybe [Integer]
 returnHome n [] = Nothing
-returnHome n p | (fst (head p)) == n = Just (getHome (snd (head p)))
-               | otherwise           = (returnHome n (tail p))
+returnHome n p
+  | (fst (head p)) == n = Just (getHome (snd (head p)))
+  | otherwise           = (returnHome n (tail p))
 
 
 -- 4) let the following synonyms and data types represent a person's birthday
@@ -160,8 +168,9 @@ type BdTable = [(Name, Date)]
 -- 4.a) define a function that returns the date associated with a given name in a given birth day table
 getBd :: Name -> BdTable -> Maybe Date
 getBd n [] = Nothing
-getBd n ((cn, cd):ts) | cn == n   = Just cd
-                      | otherwise = getBd n ts
+getBd n ((cn, cd):ts)
+  | cn == n   = Just cd
+  | otherwise = getBd n ts
 
 -- 4.b) define a function that returns the age of a person in a given date
 ageDiff :: Date -> Maybe Date -> Maybe Int
@@ -171,8 +180,9 @@ ageDiff (D _ _ y1) (Just (D _ _ y2))
 ageDiff _ Nothing = Nothing
 
 age :: Date -> Name -> BdTable -> Maybe Int
-age d n bdt = let bd = getBd n bdt
-              in ageDiff d bd
+age d n bdt =
+  let bd = getBd n bdt
+  in ageDiff d bd
 
 -- 4.c) define a function that tests if a given date came before another
 before :: Date -> Date -> Bool
@@ -196,8 +206,9 @@ bdToAge :: Date -> (Name, Date) -> (Name, Int)
 bdToAge (D _ _ y1) (x, D _ _ y2) = (x, y1 - y2)
 
 byAge :: Date -> BdTable -> [(Name, Int)]
-byAge d t = let ascAge = reverse (sortBdTable t)
-            in map (\x -> bdToAge d x) ascAge
+byAge d t =
+  let ascAge = reverse (sortBdTable t)
+  in map (\x -> bdToAge d x) ascAge
 
 
 -- 5) let the following types describe banking information s.t. each object of type Statement indicates an initial balance and a list of banking operations. each operation is represented by a tuple containing a date, a description, and the (positive) amount traded
@@ -215,9 +226,10 @@ thd3 :: (a, b, c) -> c
 thd3 (_, _, x) = x
 
 getOpValue :: (a, b, Operation) -> Float
-getOpValue x = case x of
-                 (_, _, Credit x) -> x
-                 (_, _, Debit x)  -> x
+getOpValue x =
+  case x of
+    (_, _, Credit x) -> x
+    (_, _, Debit x)  -> x
                  
 stmtAmount :: Statement -> Float -> [Operation]
 stmtAmount (Stmt _ []) _ = []
@@ -244,6 +256,7 @@ creDeb (Stmt x ((_, _, op):ss)) =
 -- 5.d) define a function that returns the final balance resulting from all the operations applied on the initial balance
 balance :: Statement -> Float
 balance (Stmt x []) = x
-balance (Stmt x ((_, _, op):ss)) = case op of
-                                     Credit c -> (balance (Stmt x ss)) - c
-                                     Debit d  -> (balance (Stmt x ss)) + d
+balance (Stmt x ((_, _, op):ss)) =
+  case op of
+    Credit c -> (balance (Stmt x ss)) - c
+    Debit d  -> (balance (Stmt x ss)) + d

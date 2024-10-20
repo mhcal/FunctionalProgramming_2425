@@ -21,10 +21,10 @@ plusplus [] (h:t) = plusplus [h] t
 plusplus (h:t) b  = (h:(plusplus t b))
 
 -- 4) (!!) (pre-defined) (given a list l and an integer n, return the n-th element of l (0-indexed))
-exclexcl :: [a] -> Int -> a
-exclexcl (h:t) x
+excexc :: [a] -> Int -> a
+excexc (h:t) x
   | x == 0    = h
-  | otherwise = exclexcl t (x - 1)
+  | otherwise = excexc t (x - 1)
 
 -- 5) reverse (pre-defined) (given a list, return a new list with the old elements reversed)
 reverse1 :: [a] -> [a]
@@ -34,39 +34,38 @@ reverse1 l   = ((last l):(reverse1 (init l)))
 
 -- 6) take (pre-defined) (given an integer n and a list l, return a list with, atmost, the first n elements of l)
 take1 :: Int -> [a] -> [a]
-take1 0 l     = []
 take1 _ []    = []
-take1 x (h:t) = (h:(take1 (x - 1) t))
+take1 x (h:t)
+  | x > 0     = (h:(take1 (x - 1) t))
+  | otherwise = []
 
 -- 7) drop (pre-defined) (given an integer n and a list l, return l without its first n elements)
 drop1 :: Int -> [a] -> [a]
-drop1 0 l     = l
 drop1 _ []    = []
+drop1 0 l     = l
 drop1 x (h:t) = drop1 (x - 1) t
 
 -- 8) zip (pre-defined) (given two lists l1 and l2, return a list of pairs containing the n-th elements of l1 and l2)
 zip1 :: [a] -> [b] -> [(a, b)]
-zip1 [] _            = []
-zip1 _ []            = []
 zip1 (h1:t1) (h2:t2) = ((h1, h2):(zip1 t1 t2))
+zip1 _ _             = []
 
 -- 9) replicate (pre-defined) (given an integer n and an element x, return a list with n elements in which all elements = x)
 replicate1 :: Int -> a -> [a]
 replicate1 0 _ = []
-replicate1 1 x = [x]
 replicate1 n x = (x:(replicate1 (n - 1) x))
 
   -- 10) intersperse (pre-defined) (given an element x of type a and a list l of type [a], return a list where element x is interleaved between all the elements of list l)
 intersperse1 :: a -> [a] -> [a]
-intersperse1 x l =
+intersperse1 _ [] = []
+intersperse1 x l  =
   case l of
-    []     -> l
     (h:[]) -> l
     (h:t)  -> (h:x:(intersperse1 x t))
 
 -- 11) group (pre-defined) (given a list l, return a list where every consecutive and identical element of l is grouped together in a nested list)
 group1 :: Eq a => [a] -> [[a]]
-group1 [] = []
+group1 []     = []
 group1 (x:xs) = group1' [x] xs
   where
     group1' current [] = [current]
@@ -76,56 +75,42 @@ group1 (x:xs) = group1' [x] xs
 
 -- 12) concat (pre-defined) (given a list of lists, return a single list with all contained elements)
 concat1 :: [[a]] -> [a]
-concat1 l =
-  case l of
-    []    -> []
-    (h:t) -> plusplus h (concat1 t)
+concat1 []    = []
+concat1 (h:t) = plusplus h (concat1 t)
 
 -- 13) inits (pre-defined) (returns a list with all prefixes of a given list)
 inits1 :: [a] -> [[a]]
-inits1 l =
-  case l of
-    [] -> []
-    l  -> ((il):(inits1 il))
+inits1 [] = []
+inits1 l  = ((il):(inits1 il))
   where il = init l
 
 -- 14) tails (pre-defined) (retuns a list with all suffixes of a given list)
 tails1 :: [a] -> [[a]]
-tails1 l =
-  case l of
-    [] -> []
-    l  -> ((tl):(tails1 tl))
+tails1 [] = []
+tails1 l  = ((tl):(tails1 tl))
   where tl = tail l
 
 -- 15) heads (given a list of lists, returns the first element of each of the nested lists)
 heads :: [[a]] -> [a]
-heads l =
-  case l of
-    []    -> []
-    [[]]  -> []
-    (h:t) -> ((head h):(heads t))
+heads []    = []
+heads [[]]  = []
+heads (h:t) = ((head h):(heads t))
 
 -- 16) total (given a list of lists, returns the total amount of elements considering all lists)
 total :: [[a]] -> Int
-total l =
-  case l of
-    []    -> 0
-    [[]]  -> 0
-    (h:t) -> length h + (total t)
+total []    = 0
+total [[]]  = 0
+total (h:t) = length h + (total t)
 
 -- 17) fun (given a list of triples, return a list of pairs consisting of the first and third elements of each triple)
 fun :: [(a, b, c)] -> [(a, c)]
-fun l =
-  case l of
-    []            -> []
-    ((a, b, c):t) -> ((a, c):(fun t))
+fun []            = []
+fun ((a, b, c):t) = ((a, c):(fun t))
 
 -- 18) glue (given a list of triples, in which the first element of each triple is a string, return a string with each first element concatenated)
 glue :: [(String, b, c)] -> String
-glue l =
-  case l of
-    []            -> []
-    ((s, _, _):t) -> plusplus s (glue t)
+glue []            = []
+glue ((s, _, _):t) = plusplus s (glue t)
 
 -- 19) age (given an year y, an age a, and a list of (String, Int) s.t. the first element is a name and the second element is a birth year, return return the name of people that have an age >= a at year y)
 age :: Int -> Int -> [(String, Int)] -> [String]
@@ -247,10 +232,10 @@ lookup1 a (h:t)
 -- 36) preAscending (returns the largest ascending prefix of a given list)
 preAscending :: Ord a => [a] -> [a]
 preAscending []  = []
-preAscending [x] = [x]
 preAscending (h1:h2:t)
   | h1 <= h2  = (h1:preAscending (h2:t))
   | otherwise = [h1]
+preAscending x = x
 
 -- 37) iSort (sorts a given list using an insert function)
 iSort :: Ord a => [a] -> [a]
@@ -336,7 +321,7 @@ path (x1, y1) (x2, y2) = horizontalMoves ++ verticalMoves
 hasLoops :: (Int, Int) -> [Movement] -> Bool
 hasLoops ip m = checkLoop ip m
   where
-    checkLoop cp [] = False
+    checkLoop cp []    = False
     checkLoop cp (h:t) =
       let np = move cp h
       in if np == ip
@@ -376,3 +361,4 @@ notRepair (h:t) =
   case h of
     Broken -> (notRepair t) + 1
     _      -> notRepair t
+    

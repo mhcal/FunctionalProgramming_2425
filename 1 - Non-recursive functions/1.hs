@@ -16,18 +16,21 @@ firstLast l = (head l, last l)
 
 -- 1.d) tests if a number m is a multiple of n
 multiple :: Int -> Int -> Bool
-multiple m n | mod m n == 0 = True
-             | otherwise    = False
+multiple m n
+  | mod m n == 0 = True
+  | otherwise    = False
 
 -- 1.e) given a list, remove the first element of it if its length is odd
 truncateOdd :: [a] -> [a]
-truncateOdd l | mod (length l) 2 == 0 = l
-              | otherwise             = tail l
+truncateOdd l
+  | mod (length l) 2 == 0 = l
+  | otherwise             = tail l
 
 -- 1.f) output the greatest of two given integers
 max2 :: Int -> Int -> Int
-max2 a b | a >= b    = a
-         | otherwise = b
+max2 a b
+  | a >= b    = a
+  | otherwise = b
 
 -- 1.g) output the greatest of three given integers using the function max2
 max3 :: Int -> Int -> Int -> Int
@@ -37,33 +40,34 @@ max3 a b c = max2 c (max2 a b)
 -- 2) define the following functions about second degree polynomials
 -- 2.a) given the three coefficients of a polynomial return the number of real roots it has
 nRoots :: Double -> Double -> Double -> Int
-nRoots a b c = if (b^2 - 4 * a * c) > 0
-                then 2
-                else if (b^2 - 4 * a * c) == 0
-                     then 1
-                     else 0
+nRoots a b c
+  | delta > 0  = 2
+  | delta == 0 = 1
+  | otherwise  = 0
+  where delta = (b^2 - 4 * a * c)
 
 -- 2.b) using the last function, given the coefficients of a polynomial, return a list with its roots
 roots :: Double -> Double -> Double -> (Double, Double)
-roots a b c = if nRoots a b c == 2
-              then ((-b + sqrt(b^2 - 4 * a * c))/2 * a, (-b - sqrt(b^2 - 4 * a * c))/2 * a)
-              else if nRoots a b c == 1
-                   then ((-b/2 * a), 0)
-                   else (0, 0)
-
-
+roots a b c
+  | nRoots a b c == 2 = ((-b + delta)/2, (-b - delta)/2)
+  | nRoots a b c == 1 = ((-b)/2 * a, 0)
+  | otherwise         = (0, 0)
+  where delta = (b^2 - 4 * a * c)
+  
 -- 3) let the following data type represent time (hours and minutes) using a pair of integers
 type Time = (Int, Int)
 
 -- 3.a) define a function that checks if a given time is valid
 testHours :: Time -> Bool
-testHours (h, m) | (0 <= h) && (h <= 23) && (0 <= m) && (m <= 59) = True
-                 | otherwise                                      = False
+testHours (h, m)
+  | (0 <= h) && (h <= 23) && (0 <= m) && (m <= 59) = True
+  | otherwise                                      = False
 
 -- 3.b) check if a given time is after another
 isAfter :: Time -> Time -> Bool
-isAfter (h1, m1) (h2, m2) | (h1 > h2) || (h1 == h2 && m1 > m2) = True
-                          | otherwise                          = False
+isAfter (h1, m1) (h2, m2)
+  | (h1 > h2) || (h1 == h2 && m1 > m2) = True
+  | otherwise                          = False
 
 -- 3.c) convert from hh:mm to minutes
 convertToMins :: Time -> Int
@@ -86,13 +90,15 @@ addMinutes h c = (mod (div ((convertToMins h) + c) 60) 24, mod ((convertToMins h
 data Hour = H Int Int deriving (Show, Eq)
 -- 4.a)
 testTime1 :: Hour -> Bool
-testTime1 (H h m) | ((h >= 0) && (h <= 23) && (m >= 0) && (m <= 59)) = True
-                  | otherwise                                        = False
+testTime1 (H h m)
+  | ((h >= 0) && (h <= 23) && (m >= 0) && (m <= 59)) = True
+  | otherwise                                        = False
 
 -- 4.b)
 compareTime1 :: Hour -> Hour -> Bool
-compareTime1 (H h1 m1) (H h2 m2) | (h1 > h2) || (h1 == h2 && m1 > m2) = True
-                                 | otherwise                          = False
+compareTime1 (H h1 m1) (H h2 m2)
+  | (h1 > h2) || (h1 == h2 && m1 > m2) = True
+  | otherwise                          = False
 
 -- 4.c)
 convertToMins1 :: Hour -> Int
@@ -116,26 +122,26 @@ data Stoplight = Green | Yellow | Red deriving (Show,Eq)
 
 -- 5.a) define a function that returns the next color of a stoplight given the current state
 next :: Stoplight -> Stoplight
-next c = if c == Green
-         then Yellow
-         else if c == Yellow
-              then Red
-              else Green
+next c =
+  case c of
+    Green  -> Yellow
+    Yellow -> Red
+    Red    -> Green
 
 -- 5.b) define a function that says if you're required to stop at a given stoplight color
 stop :: Stoplight -> Bool
-stop c | c == Red  = True
-       | otherwise = False  
+stop c =
+  case c of
+    Red -> True
+    _   -> False
 
 -- 5.c) define a function that says if the current state of two stoplights at a crossroad is safe
 safe :: Stoplight -> Stoplight -> Bool
-safe c1 c2 = if c1 == Green || c1 == Yellow
-             then if c2 == Red
-                  then True
-                  else False
-             else True
-
-
+safe c1 c2 =
+  case c1 of
+    Red -> False
+    _   -> if c2 == Red then True else False
+    
 -- 6) a point in a plane can be represented as a cartesian system of coordinates (distance to the horizontal/vertical axes) or by a polar system of coordinates (distance to the origin and angle between the vector and the horizontal axis); e.g. the following type can represent a coordinate either as Cartesian (-1) 0 or Polar 1 pi
 data PlanePoint = Cartesian Double Double | Polar Double Double
                 deriving (Show,Eq)
@@ -219,18 +225,21 @@ perimeter2 (Circle _ r)        = 2 * pi * r
 -- 8) using the functions ord :: Char -> Int and chr :: Int -> Char from the module Data.Char, define the following functions:
 -- 8.a) tests if a given char is lowercase
 isLower1 :: Char -> Bool
-isLower1 x | (ord x) >= 97 && (ord x) <= 122 = True
-           | otherwise                       = False
+isLower1 x
+  | (ord x) >= 97 && (ord x) <= 122 = True
+  | otherwise                       = False
            
 -- 8.b) tests if a char is a digit
 isDigit1 :: Char -> Bool
-isDigit1 x | (ord x) >= 48 && (ord x) <= 57 = True
-           | otherwise                      = False
+isDigit1 x
+  | (ord x) >= 48 && (ord x) <= 57 = True
+  | otherwise                      = False
 
 -- 8.c) tests if a char is a letter
-isAlpha1 :: Char -> Bool
-isAlpha1 x | ((ord x) >= 65 && (ord x) <= 90) || ((ord x) >= 97 && (ord x) <= 122) = True
-           | otherwise = False
+isAlpha1 x
+  | ((ord x) >= 65 && (ord x) <= 90)  = True
+  | ((ord x) >= 97 && (ord x) <= 122) = True
+  | otherwise                         = False
            
 -- 8.d) converts from lowercase to uppercase
 toUpper1 :: Char -> Char
@@ -243,4 +252,3 @@ intToDigit1 x = chr (x + 48)
 -- 8.f) converts a digit to its respective integer
 digitToInt1 :: Char -> Int
 digitToInt1 x = ord x - 48
-                     

@@ -72,12 +72,12 @@ fromDigits []    = 0
 fromDigits (h:t) = h*10^(length t) + fromDigits t
 -}
 fromDigits :: [Int] -> Int
-fromDigits s = fromDigits' s 0
+fromDigits [] = 0
+fromDigits s  = fromDigits' s 0
   where
     fromDigits' :: [Int] -> Int -> Int
     fromDigits' [] acc    = acc
-    fromDigits' (h:t) acc = fromDigits' t (acc + (h * 10^(length t)))
-
+    fromDigits' (h:t) acc = fromDigits' t (h + (10 * acc))
 
 -- 5) using an auxiliary function with accumulating parameters, optimize the following definition that returns the sum of the initial segments of a list with maximum sum
 {-

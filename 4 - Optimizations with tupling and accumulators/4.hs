@@ -23,6 +23,7 @@ digitAlpha l  =
       | isAlpha s = digitAlpha' ss (s:l, n)
       | isDigit s = digitAlpha' ss (l, s:n)
 
+
 -- 2) define a function that returns a triple (Int, Int, Int) s.t. the first element is the amount of negative values, the second is the amount of zeroes, and the third is the amount of positive values on a given [Int] list
 nzp :: [Int] -> (Int, Int, Int)
 {- definition with function composition:
@@ -44,6 +45,7 @@ nzp l  = nzp' l (0, 0, 0)
       | x < 0  = nzp' xs (f + 1, s, t)
       | x == 0 = nzp' xs (f, s + 1, t)
       | x > 0  = nzp' xs (f, s, t + 1)
+
     
 -- 3) define a function that computes a division through recursive subtraction and returns a pair (a, b) s.t. a = the integer division and b = the remainder of the division
 {- definition with function composition:
@@ -64,6 +66,7 @@ divMod1 a b = Just (divMod1' b (0, a))
     divMod1' b (q, r)
       | b > r     = (q, r)
       | otherwise = divMod1' b (q + 1, r - b)
+
       
 -- 4) using an auxiliary function with an accumulating parameter, optimize the following recursive definition that returns the number represented by a list of digits
 {-
@@ -78,6 +81,7 @@ fromDigits s  = fromDigits' s 0
     fromDigits' :: [Int] -> Int -> Int
     fromDigits' [] acc    = acc
     fromDigits' (h:t) acc = fromDigits' t (h + (10 * acc))
+
 
 -- 5) using an auxiliary function with accumulating parameters, optimize the following definition that returns the sum of the initial segments of a list with maximum sum
 {-
@@ -105,6 +109,7 @@ fib n = fib' n 0 1
     fib' :: Int -> Int -> Int -> Int
     fib' 0 x _ = x
     fib' n x y = fib' (n - 1) y (x + y)
+
 
 -- 7) define a function that converts an Integer to a String using an auxiliary function, returning the value of an accumulating parameter on which the String will be built
 intToStr :: Int -> String

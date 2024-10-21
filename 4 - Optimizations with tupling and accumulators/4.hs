@@ -2,38 +2,69 @@ import Data.Char
 import Data.List
 
 -- 1) define a function that returns a tuple (String, String) s.t. the first element has all the letters and the second element has all the digits of a given String
-addListPair :: ([a], [a]) -> ([a], [a]) -> ([a], [a])
-addListPair (x1, x2) (y1, y2) = (x1 ++ y1, x2 ++ y2)
-
 digitAlpha :: String -> (String, String)
+{- definition with function composition:
 digitAlpha [] = ([], [])
 digitAlpha (s:ss)
   | isAlpha s = addListPair ([s], []) (digitAlpha ss)
   | isDigit s = addListPair ([], [s]) (digitAlpha ss)
+  where
+    addListPair :: ([a], [a]) -> ([a], [a]) -> ([a], [a])
+    addListPair (x1, x2) (y1, y2) = (x1 ++ y1, x2 ++ y2)
 
+definition with accumulating parameter: -}
+digitAlpha [] = ([], [])
+digitAlpha l  =
+  digitAlpha' l ([], [])
+  where
+    digitAlpha' :: String -> (String, String) -> (String, String)
+    digitAlpha' [] acc = acc
+    digitAlpha' (s:ss) (l, n)
+      | isAlpha s = digitAlpha' ss (s:l, n)
+      | isDigit s = digitAlpha' ss (l, s:n)
 
 -- 2) define a function that returns a triple (Int, Int, Int) s.t. the first element is the amount of negative values, the second is the amount of zeroes, and the third is the amount of positive values on a given [Int] list
-addTriple :: Num a => (a, a, a) -> (a, a, a) -> (a, a, a)
-addTriple (x1, x2, x3) (y1, y2, y3) = (x1 + y1, x2 + y2, x3 + y3)
-
 nzp :: [Int] -> (Int, Int, Int)
+{- definition with function composition:
 nzp [] = (0, 0, 0)
 nzp (x:xs)
   | x < 0  = addTriple (1, 0, 0) (nzp xs)
   | x == 0 = addTriple (0, 1, 0) (nzp xs)
   | x > 0  = addTriple (0, 0, 1) (nzp xs)
+  where
+    addTriple :: Num a => (a, a, a) -> (a, a, a) -> (a, a, a)
+    addTriple (x1, x2, x3) (y1, y2, y3) = (x1 + y1, x2 + y2, x3 + y3)
 
-
+definition with accumulating parameter: -}
+nzp l  = nzp' l (0, 0, 0)
+  where
+    nzp' :: [Int] -> (Int, Int, Int) -> (Int, Int, Int)
+    nzp' [] acc = acc
+    nzp' (x:xs) (f, s, t)
+      | x < 0  = nzp' xs (f + 1, s, t)
+      | x == 0 = nzp' xs (f, s + 1, t)
+      | x > 0  = nzp' xs (f, s, t + 1)
+    
 -- 3) define a function that computes a division through recursive subtraction and returns a pair (a, b) s.t. a = the integer division and b = the remainder of the division
-addPair :: Num a => (a, a) -> (a, a) -> (a, a)
-addPair (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
-
+{- definition with function composition:
 divMod1 :: Integral a => a -> a -> (a, a)
 divMod1 a b
   | b > a     = (0, (b - a))
   | otherwise = addPair (1, 0) (divMod1 (a - b) b)
+  where
+    addPair :: Num a => (a, a) -> (a, a) -> (a, a)
+    addPair (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
 
-
+definition with accumulating parameter: -}
+divMod1 :: Integral a => a -> a -> Maybe (a, a)
+divMod1 _ 0 = Nothing
+divMod1 a b = Just (divMod1' b (0, a))
+  where
+    divMod1' :: Integral a => a -> (a, a) -> (a, a)
+    divMod1' b (q, r)
+      | b > r     = (q, r)
+      | otherwise = divMod1' b (q + 1, r - b)
+      
 -- 4) using an auxiliary function with an accumulating parameter, optimize the following recursive definition that returns the number represented by a list of digits
 {-
 fromDigits :: [Int] -> Int
@@ -76,7 +107,6 @@ fib n = fib' n 0 1
     fib' n x y = fib' (n - 1) y (x + y)
 
 -- 7) define a function that converts an Integer to a String using an auxiliary function, returning the value of an accumulating parameter on which the String will be built
-                     
 intToStr :: Int -> String
 intToStr n = intToStr' n []
   where

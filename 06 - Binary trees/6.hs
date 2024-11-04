@@ -16,7 +16,7 @@ countNodes (Node _ l r) = 1 + countNodes l + countNodes r
 
 -- c) leafs (returns the amount of leafs -- i.e. nodes that don't contain any subtrees)
 leafs :: BTree a -> Int
-leafs Empty = 1
+leafs Empty = 0
 leafs (Node _ Empty Empty) = 1
 leafs (Node _ l r) = (leafs l) + (leafs r)
 

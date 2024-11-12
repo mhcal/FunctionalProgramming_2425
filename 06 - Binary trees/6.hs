@@ -26,13 +26,13 @@ prune _ Empty = Empty
 prune 0 _ = Empty
 prune h (Node n l r) = (Node n (prune (h - 1) l) (prune (h - 1) r))
 
--- e) path (given a path (True -> left; False -> right) and a binary tree, return a list of the nodes traversed)
+-- e) path (given a path (False = left; True = right) and a binary tree, return a list of the nodes traversed)
 path :: [Bool] -> BTree a -> [a]
 path [] (Node n _ _) = [n]
 path (x:xs) (Node n l r) =
   case x of
-    True -> (n:(path xs l))
-    False -> (n:(path xs r))
+    True -> (n:(path xs r))
+    False -> (n:(path xs l))
 path _ _ = []
 
 -- f) mirror (returns a symmetric tree)
@@ -42,7 +42,8 @@ mirror (Node n l r) = (Node n (mirror r) (mirror l))
 
 -- g) zipWithBT (zipWith for binary trees)
 zipWithBT :: (a -> b -> c) -> BTree a -> BTree b -> BTree c
-zipWithBT f (Node n1 l1 r1) (Node n2 l2 r2) = (Node (f n1 n2) (zipWithBT f l1 l2) (zipWithBT f r1 r2))
+zipWithBT f (Node n1 l1 r1) (Node n2 l2 r2) =
+  (Node (f n1 n2) (zipWithBT f l1 l2) (zipWithBT f r1 r2))
 zipWithBT _ _ _ = Empty
 
 -- h) unzipBT (unzip implementation for trees of triples)
@@ -64,7 +65,7 @@ minTree (Node n l r) =
 
 -- b) noMinTree (removes the smallest value from a non-empty binary search tree)
 noMinTree :: Ord a => BTree a -> BTree a
-noMinTree (Node n Empty Empty) = Empty
+noMinTree (Node n Empty r) = r
 noMinTree (Node n l r) = (Node n (noMinTree l) r)
 
 -- c) minNmin (returns, in a pair, the result of the two previous functions in only one traversal)
@@ -91,7 +92,7 @@ remove x (Node n l r)
       in (Node m l nr)
 
 
--- 3) consider the following data structure to store a classroom's information
+-- 3) consider the following data structure to store a classroom's information in a binary search tree
 type Student = (Number, Name, Regime, Classification)
 type Number = Int
 type Name = String

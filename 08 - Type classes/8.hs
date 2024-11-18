@@ -99,6 +99,7 @@ instance Num IntExp  where
 
 -- 3) recall the type definition for bank accounts in the third problem set:
 data Operation = Credit Float | Debit Float
+               deriving Show
 data Date = D Int Int Int
 data Statement = Stmt Float [(Date, String, Operation)]
 
@@ -132,13 +133,22 @@ instance Show Statement where
     show (Stmt pb l) =
       concat
       ["Previous balance: ", show pb, 
-       "\n---------------------------------------",
-       "\nDate       Description   Credit   Debit",
-       "\n---------------------------------------\n",
-       concatMap (\(d, s, op) -> show d ++ replicate (11 - (length (show d))) ' ' ++ map (toUpper) s ++ replicate (16 - (length (show s))) ' ' ++ credordeb op ++ "\n") l,
-       "---------------------------------------",
+       "\n", replicate 39 '-', replicate (sl + crl + dbl - 39) '-',
+       "\nDate", replicate (dl - 4) ' ', "  Description", replicate (sl - 11) ' ', "  Credit", replicate (crl - 6) ' ', "  Debit",
+       "\n", replicate 39 '-', replicate (sl + crl + dbl - 39) '-', "\n",
+        concatMap showline l,
+        replicate 39 '-', replicate (dl + sl + crl + dbl - 39) '-',
        "\nCurrent balance: ", show (balance (Stmt pb l))]
       where
-        credordeb :: Operation -> String
-        credordeb (Credit x) = show x
-        credordeb (Debit x) = replicate 11 ' ' ++ show x
+        dl = 10
+        sl = maximum $ map (\(_, s, _) -> length s) l
+        (crl, dbl) =
+          let isCredit (Credit _) = True
+              isCredit _ = False
+              (credl, debl) = partition isCredit $ (map (\(_, _, op) -> op) l)
+          in (maximum $ map (length . show . (\(Credit x) -> x)) credl, maximum $ map (length . show . (\(Debit x) -> x)) debl)
+        showline (d, s, op) =
+          let credordeb (Credit x) = show x
+              credordeb (Debit x) = concat [replicate 8 ' ', replicate (crl - 6) ' ', show x]
+          in concat [show d, replicate (12 - length (show d)) ' ', map (toUpper) s, replicate (15 - length (show s)) ' ', credordeb op, "\n"]
+                          

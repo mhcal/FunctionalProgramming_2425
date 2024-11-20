@@ -133,22 +133,39 @@ instance Show Statement where
     show (Stmt pb l) =
       concat
       ["Previous balance: ", show pb, 
-       "\n", replicate 39 '-', replicate (sl + crl + dbl - 39) '-',
-       "\nDate", replicate (dl - 4) ' ', "  Description", replicate (sl - 11) ' ', "  Credit", replicate (crl - 6) ' ', "  Debit",
-       "\n", replicate 39 '-', replicate (sl + crl + dbl - 39) '-', "\n",
-        concatMap showline l,
-        replicate 39 '-', replicate (dl + sl + crl + dbl - 39) '-',
+       "\n", d,
+       "\n", h,
+       "\n", d,
+       "\n", concatMap showline l,
+       d,
        "\nCurrent balance: ", show (balance (Stmt pb l))]
       where
         dl = 10
-        sl = maximum $ map (\(_, s, _) -> length s) l
+        sl = max 11 $ maximum $ map (\(_, s, _) -> length s) l
         (crl, dbl) =
           let isCredit (Credit _) = True
               isCredit _ = False
               (credl, debl) = partition isCredit $ (map (\(_, _, op) -> op) l)
-          in (maximum $ map (length . show . (\(Credit x) -> x)) credl, maximum $ map (length . show . (\(Debit x) -> x)) debl)
+              getcrl = maximum $ map (length . show . (\(Credit x) -> x)) credl
+              getdbl = maximum $ map (length . show . (\(Debit x) -> x)) debl
+          in (max 6 getcrl, max 5 getdbl)
+        d = let divisorlength = sum [max 4 dl,
+                                     2, max 11 sl,
+                                     2, max 6 crl,
+                                     2, max 5 dbl]
+              in replicate divisorlength '-'
+        h = concat ["Date",
+                    replicate (dl - 4) ' ',
+                    "  Description",
+                    replicate (sl - 11) ' ',
+                    "  Credit",
+                    replicate (crl - 6) ' ',
+                    "  Debit"]
         showline (d, s, op) =
-          let credordeb (Credit x) = show x
-              credordeb (Debit x) = concat [replicate 8 ' ', replicate (crl - 6) ' ', show x]
-          in concat [show d, replicate (12 - length (show d)) ' ', map (toUpper) s, replicate (15 - length (show s)) ' ', credordeb op, "\n"]
-                          
+          let credordeb (Credit x) = "  " ++ show x
+              credordeb (Debit x) = (replicate (crl + 4) ' ') ++ show x
+          in concat [show d,
+                     replicate (dl + 2 - (length $ show d)) ' ',
+                     map toUpper s,
+                     replicate (sl + 2 - (length $ show s)) ' ',
+                     credordeb op, "\n"]

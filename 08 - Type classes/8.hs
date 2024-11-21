@@ -153,7 +153,7 @@ instance Show Statement where
                                      2, max 11 sl,
                                      2, max 6 crl,
                                      2, max 5 dbl]
-              in replicate divisorlength '-'
+            in replicate divisorlength '-'
         h = concat ["Date",
                     replicate (dl - 4) ' ',
                     "  Description",
